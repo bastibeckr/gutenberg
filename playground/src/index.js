@@ -17,7 +17,7 @@ import {
 	BlockInspector,
 	WritingFlow,
 	ObserveTyping,
-	__experimentalLinkControl,
+	__experimentalLinkControl as LinkControl,
 } from '@wordpress/block-editor';
 import {
 	Button,
@@ -93,6 +93,7 @@ function App() {
 
 	const handleOnKeyDownEvent = ( event, suggestion ) => {
 		if ( null !== suggestion ) {
+			console.log( `suggestion: ${ suggestion }` );
 		}
 
 		// Do not stop propagation for ESCAPE key
@@ -103,7 +104,8 @@ function App() {
 		event.stopPropagation();
 	};
 
-	const handleOnKeyPressEvent = ( event ) => {
+	const handleOnKeyPressEvent = ( event) => {
+		console.log( `onKeyPress - Key code: ${ event.keyCode }` );
 		event.stopPropagation();
 	};
 
@@ -131,7 +133,7 @@ function App() {
 								<WritingFlow>
 									<ObserveTyping>
 										{ isVisible &&
-											<__experimentalLinkControl
+											<LinkControl
 												currentLink={ link }
 												currentSettings={ linkSettings }
 												onLinkChange={ ( theLink ) => {
@@ -146,9 +148,7 @@ function App() {
 												fetchSearchSuggestions={ fetchFauxEntitySuggestions }
 												onKeyDown={ handleOnKeyDownEvent }
 												onKeyPress={ handleOnKeyPressEvent }
-												onClose={ () => {
-													setIsVisible( false );
-												} }
+												onClose={ () => { setIsVisible( false ) } }
 											/>
 										}
 										<BlockList />
@@ -166,4 +166,7 @@ function App() {
 }
 
 registerCoreBlocks();
-render( <App />, document.querySelector( '#app' ) );
+render(
+	<App />,
+	document.querySelector( '#app' )
+);

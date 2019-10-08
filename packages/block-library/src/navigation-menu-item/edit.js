@@ -29,55 +29,39 @@ import {
 	BlockControls,
 	InnerBlocks,
 	InspectorControls,
-	URLPopover,
+	__experimentalLinkControl as LinkControl,
 } from '@wordpress/block-editor';
-import {
-	Fragment,
-	useRef,
-	useState,
-} from '@wordpress/element';
+import { Fragment, useState, useRef } from '@wordpress/element';
 
 function NavigationMenuItemEdit( {
 	attributes,
 	isSelected,
 	isParentOfSelectedBlock,
 	setAttributes,
+	fetchSearchSuggestions,
 } ) {
-	const plainTextRef = useRef( null );
+	const { label, link } = attributes;
+	const initialLinkSetting = { 'new-tab': link.newTab };
 	const [ isLinkOpen, setIsLinkOpen ] = useState( false );
-	const [ isEditingLink, setIsEditingLink ] = useState( false );
-	const [ urlInput, setUrlInput ] = useState( null );
 
-	const inputValue = urlInput !== null ? urlInput : url;
+	const plainTextRef = useRef( null );
 
-	const onKeyDown = ( event ) => {
-		if ( [ LEFT, DOWN, RIGHT, UP, BACKSPACE, ENTER ].indexOf( event.keyCode ) > -1 ) {
+	const handleLinkControlOnKeyDown = ( event ) => {
+		const { keyCode } = event;
+
+		if ( [ LEFT, DOWN, RIGHT, UP, BACKSPACE, ENTER ].indexOf( keyCode ) > -1 ) {
 			// Stop the key event from propagating up to ObserveTyping.startTypingInTextField.
 			event.stopPropagation();
 		}
 	};
 
-	const closeURLPopover = () => {
-		setIsEditingLink( false );
-		setUrlInput( null );
-		setIsLinkOpen( false );
+	const closeLinkControl = () => setIsLinkOpen( false );
+
+	const updateLinkSetting = ( setting, value ) => {
+		const newTab = 'new-tab' === setting ? value : link.newTab;
+		setAttributes( { link: { ...link, newTab } } );
 	};
 
-	const autocompleteRef = useRef( null );
-
-	const onFocusOutside = ( event ) => {
-		const autocompleteElement = autocompleteRef.current;
-		if ( autocompleteElement && autocompleteElement.contains( event.target ) ) {
-			return;
-		}
-		closeURLPopover();
-	};
-
-	const stopPropagation = ( event ) => {
-		event.stopPropagation();
-	};
-
-	const { label, url } = attributes;
 	let content;
 	if ( isSelected ) {
 		content = (
@@ -107,31 +91,17 @@ function NavigationMenuItemEdit( {
 						onClick={ () => setIsLinkOpen( ! isLinkOpen ) }
 					/>
 					{ isLinkOpen &&
-					<>
-						<URLPopover
+						<LinkControl
 							className="wp-block-navigation-menu-item__inline-link-input"
-							onClose={ closeURLPopover }
-							onFocusOutside={ onFocusOutside }
-						>
-							{ ( ! url || isEditingLink ) &&
-							<URLPopover.LinkEditor
-								value={ inputValue }
-								onChangeInputValue={ setUrlInput }
-								onKeyPress={ stopPropagation }
-								onKeyDown={ onKeyDown }
-								onSubmit={ ( event ) => event.preventDefault() }
-								autocompleteRef={ autocompleteRef }
-							/>
-							}
-							{ ( url && ! isEditingLink ) &&
-								<URLPopover.LinkViewer
-									onKeyPress={ stopPropagation }
-									url={ url }
-								/>
-							}
-
-						</URLPopover>
-					</>
+							onKeyDown={ handleLinkControlOnKeyDown }
+							onKeyPress={ ( event ) => event.stopPropagation() }
+							onClose={ closeLinkControl }
+							currentLink={ link }
+							onLinkChange={ ( link ) => setAttributes( { link } ) }
+							currentSettings={ initialLinkSetting }
+							onSettingsChange={ updateLinkSetting }
+							fetchSearchSuggestions={ fetchSearchSuggestions }
+						/>
 					}
 				</Toolbar>
 			</BlockControls>
@@ -203,10 +173,11 @@ function NavigationMenuItemEdit( {
 }
 
 export default withSelect( ( select, ownProps ) => {
-	const { hasSelectedInnerBlock } = select( 'core/block-editor' );
+	const { hasSelectedInnerBlock, getSettings } = select( 'core/block-editor' );
 	const { clientId } = ownProps;
 
 	return {
 		isParentOfSelectedBlock: hasSelectedInnerBlock( clientId, true ),
+		fetchSearchSuggestions: getSettings().__experimentalFetchLinkSuggestions,
 	};
 } )( NavigationMenuItemEdit );

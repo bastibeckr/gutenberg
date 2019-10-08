@@ -21,6 +21,10 @@
 		},
 		"url": {
 			"type": "string"
+		},
+		"link": {
+			"type": "object",
+			"default": {}
 		}
 	}
 }

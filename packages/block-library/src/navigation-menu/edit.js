@@ -50,11 +50,13 @@ function NavigationMenu( {
 			if ( ! pages ) {
 				return null;
 			}
-			return pages.map( ( page ) => {
-				return [ 'core/navigation-menu-item',
-					{ label: page.title.rendered, url: page.permalink_template },
-				];
-			} );
+			return pages.map( ( { title, permalink_template, type, link, id  } ) => (
+				[ 'core/navigation-menu-item', {
+					label: title.rendered,
+					destination: permalink_template,
+					link: { title: title.raw, type, id, url: link, newTab: false },
+				} ]
+			) );
 		},
 		[ pages ]
 	);

@@ -9,6 +9,7 @@ import { first, last, nth } from 'lodash';
  */
 import { useState } from '@wordpress/element';
 import { UP, DOWN, ENTER } from '@wordpress/keycodes';
+
 /**
  * Internal dependencies
  */
@@ -525,3 +526,4 @@ describe( 'Selecting links', () => {
 		} );
 	} );
 } );
+

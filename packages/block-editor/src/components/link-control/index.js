@@ -32,7 +32,6 @@ import {
 import { withInstanceId, compose } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 
-
 /**
  * Internal dependencies
  */
@@ -41,11 +40,11 @@ import LinkControlSearchItem from './search-item';
 import LinkControlInputSearch from './input-search';
 
 function LinkControl( {
-	instanceId,
-	currentLink,
 	className,
+	currentLink,
 	currentSettings,
 	fetchSearchSuggestions,
+	instanceId,
 
 	onClose = noop,
 	onLinkChange = noop,
@@ -79,7 +78,10 @@ function LinkControl( {
 	};
 
 	// Utils
+
 	const startEditMode = () => {
+		setIsEditingLink( true );
+
 		if ( isFunction( onLinkChange ) ) {
 			onLinkChange();
 		}
@@ -93,6 +95,7 @@ function LinkControl( {
 	const resetInput = () => {
 		setInputValue( '' );
 	};
+
 
 	const handleDirectEntry = ( value ) => {
 		let type = 'URL';
