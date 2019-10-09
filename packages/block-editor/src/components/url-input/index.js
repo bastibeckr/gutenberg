@@ -243,7 +243,24 @@ class URLInput extends Component {
 		const suggestionsListboxId = `block-editor-url-input-suggestions-${ instanceId }`;
 		const suggestionOptionIdPrefix = `block-editor-url-input-suggestion-${ instanceId }`;
 
-		/* eslint-disable jsx-a11y/no-autofocus */
+		const suggestionsListProps = {
+			id: suggestionsListboxId,
+			ref: this.autocompleteRef,
+			role: 'listbox',
+		};
+
+		const buildSuggestionItemProps = ( suggestion, index ) => {
+			return {
+				key: suggestion.id,
+				role: 'option',
+				tabIndex: '-1',
+				id: `${ suggestionOptionIdPrefix }-${ index }`,
+				ref: this.bindSuggestionNode( index ),
+				'aria-selected': index === selectedSuggestion,
+			};
+		};
+
+		/* eslint-disable jsx-a11y/no-autofocus, react/jsx-key */
 		return (
 			<div className={ classnames( 'editor-url-input block-editor-url-input', className, {
 				'is-full-width': isFullWidth,
@@ -272,12 +289,10 @@ class URLInput extends Component {
 
 				{ isFunction( renderSuggestions ) && showSuggestions && !! suggestions.length && renderSuggestions( {
 					suggestions,
-					suggestionsListboxId,
-					suggestionOptionIdPrefix,
 					selectedSuggestion,
-					bindSuggestionNode: this.bindSuggestionNode,
+					suggestionsListProps,
+					buildSuggestionItemProps,
 					handleSuggestionClick: this.handleOnClick,
-					autocompleteRef: this.autocompleteRef,
 				} ) }
 
 				{ ! isFunction( renderSuggestions ) && showSuggestions && !! suggestions.length &&
@@ -287,27 +302,20 @@ class URLInput extends Component {
 						focusOnMount={ false }
 					>
 						<div
+							{ ...suggestionsListProps }
 							className={ classnames(
 								'editor-url-input__suggestions',
 								'block-editor-url-input__suggestions',
 								`${ className }__suggestions`
 							) }
-							id={ suggestionsListboxId }
-							ref={ this.autocompleteRef }
-							role="listbox"
 						>
 							{ suggestions.map( ( suggestion, index ) => (
 								<button
-									key={ suggestion.id }
-									role="option"
-									tabIndex="-1"
-									id={ `${ suggestionOptionIdPrefix }-${ index }` }
-									ref={ this.bindSuggestionNode( index ) }
+									{ ...buildSuggestionItemProps( suggestion, index ) }
 									className={ classnames( 'editor-url-input__suggestion block-editor-url-input__suggestion', {
 										'is-selected': index === selectedSuggestion,
 									} ) }
 									onClick={ () => this.handleOnClick( suggestion ) }
-									aria-selected={ index === selectedSuggestion }
 								>
 									{ suggestion.title }
 								</button>
@@ -317,7 +325,7 @@ class URLInput extends Component {
 				}
 			</div>
 		);
-		/* eslint-enable jsx-a11y/no-autofocus */
+		/* eslint-enable jsx-a11y/no-autofocus, react/jsx-key */
 	}
 }
 
