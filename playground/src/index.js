@@ -110,19 +110,18 @@ function App() {
 								<WritingFlow>
 									<ObserveTyping>
 										<LinkControl
-											defaultOpen={ true }
-											fetchSearchSuggestions={ fetchFauxEntitySuggestions }
+											currentLink={ link }
+											currentSettings={ linkSettings }
 											onLinkChange={ ( theLink ) => {
 												setLink( theLink );
 											} }
-											currentLink={ link }
-											linkSettings={ linkSettings }
-											onSettingChange={ ( setting, value ) => {
+											onSettingsChange={ ( setting, value ) => {
 												setLinkSettings( {
 													...linkSettings,
 													[ setting ]: value,
 												} );
 											} }
+											fetchSearchSuggestions={ fetchFauxEntitySuggestions }
 										/>
 										<BlockList />
 									</ObserveTyping>
