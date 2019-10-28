@@ -12,8 +12,14 @@
 		"title": {
 			"type": "string"
 		},
+		"type": {
+			"type": "string"
+		},
 		"description": {
 			"type": "string"
+		},
+		"link_id": {
+			"type": "number"
 		},
 		"opensInNewTab": {
 			"type": "boolean",
@@ -21,10 +27,6 @@
 		},
 		"url": {
 			"type": "string"
-		},
-		"link": {
-			"type": "object",
-			"default": {}
 		}
 	}
 }

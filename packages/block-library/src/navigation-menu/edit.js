@@ -54,7 +54,11 @@ function NavigationMenu( {
 				[ 'core/navigation-menu-item', {
 					label: title.rendered,
 					destination: permalink_template,
-					link: { title: title.raw, type, id, url: link, newTab: false },
+					title: title.raw,
+					type,
+					link_id: id,
+					url: link,
+					newTab: false,
 				} ]
 			) );
 		},
