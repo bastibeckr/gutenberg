@@ -98,7 +98,7 @@ function NavigationMenuItemEdit( {
 					ref={ plainTextRef }
 					className="wp-block-navigation-menu-item__field"
 					value={ label }
-					onChange={ () => setIsLinkOpen( false ) }
+					onChange={ ( labelValue ) => setAttributes( { label: labelValue } ) }
 					label={ __( 'Navigation Label' ) }
 					hideLabelFromVision={ true }
 				/>
