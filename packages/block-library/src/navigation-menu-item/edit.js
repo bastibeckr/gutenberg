@@ -93,15 +93,31 @@ function NavigationMenuItemEdit( {
 	let content;
 	if ( isSelected ) {
 		content = (
-			<TextControl
-				ref={ plainTextRef }
-				className="wp-block-navigation-menu-item__field"
-				value={ label }
-				onChange={ () => setIsLinkOpen( false ) }
-				label={ __( 'Navigation Label' ) }
-				hideLabelFromVision={ true }
-			/>
+			<div className="wp-block-navigation-menu-item__field-container">
+				<TextControl
+					ref={ plainTextRef }
+					className="wp-block-navigation-menu-item__field"
+					value={ label }
+					onChange={ () => setIsLinkOpen( false ) }
+					label={ __( 'Navigation Label' ) }
+					hideLabelFromVision={ true }
+				/>
+				{ isLinkOpen &&
+					<LinkControl
+						className="wp-block-navigation-menu-item__inline-link-input"
+						onKeyDown={ handleLinkControlOnKeyDown }
+						onKeyPress={ ( event ) => event.stopPropagation() }
+						currentLink={ link }
+						onLinkChange={ updateLink }
+						onClose={ () => setIsLinkOpen( false ) }
+						currentSettings={ linkSettings }
+						onSettingsChange={ updateLinkSetting }
+						fetchSearchSuggestions={ fetchSearchSuggestions }
+					/>
+				}
+			</div>
 		);
+
 	} else {
 		content = <div className="wp-block-navigation-menu-item__container">
 			{ label }
@@ -118,19 +134,6 @@ function NavigationMenuItemEdit( {
 						title={ __( 'Link' ) }
 						onClick={ () => setIsLinkOpen( ! isLinkOpen ) }
 					/>
-					{ isLinkOpen &&
-						<LinkControl
-							className="wp-block-navigation-menu-item__inline-link-input"
-							onKeyDown={ handleLinkControlOnKeyDown }
-							onKeyPress={ ( event ) => event.stopPropagation() }
-							currentLink={ link }
-							onLinkChange={ updateLink }
-							onClose={ () => setIsLinkOpen( false ) }
-							currentSettings={ linkSettings }
-							onSettingsChange={ updateLinkSetting }
-							fetchSearchSuggestions={ fetchSearchSuggestions }
-						/>
-					}
 				</Toolbar>
 			</BlockControls>
 			<InspectorControls>
