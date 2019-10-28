@@ -46,6 +46,15 @@ function NavigationMenuItemEdit( {
 
 	const plainTextRef = useRef( null );
 
+	/**
+	 * `onKeyDown` LinkControl handler.
+	 * It takes over to stop the event propagation to make the
+	 * navigation bar work, avoiding undesired behaviours.
+	 * For instance, blocks to move between menu items
+	 * when the LinkOver is focused.
+	 *
+	 * @param event
+	 */
 	const handleLinkControlOnKeyDown = ( event ) => {
 		const { keyCode } = event;
 
@@ -55,8 +64,27 @@ function NavigationMenuItemEdit( {
 		}
 	};
 
-	const closeLinkControl = () => setIsLinkOpen( false );
+	/**
+	 * Updates the link attribute when it changes
+	 * through of the `onLinkChange` LinkControl callback.
+	 *
+	 * @param {Object|null} link The object link if it has been selected, or null.
+	 */
+	const updateLink = ( link ) => {
+		if ( ! link ) {
+			return;
+		}
+		setAttributes( { link } )
+	};
 
+
+	/**
+	 * It updates the link attribute when the
+	 * link settings change.
+	 *
+	 * @param {String} setting Setting type, for instance, `new-tab`.
+	 * @param {String} value Setting type value.
+	 */
 	const updateLinkSetting = ( setting, value ) => {
 		const newTab = 'new-tab' === setting ? value : link.newTab;
 		setAttributes( { link: { ...link, newTab } } );
@@ -69,7 +97,7 @@ function NavigationMenuItemEdit( {
 				ref={ plainTextRef }
 				className="wp-block-navigation-menu-item__field"
 				value={ label }
-				onChange={ ( labelValue ) => setAttributes( { label: labelValue } ) }
+				onChange={ () => setIsLinkOpen( false ) }
 				label={ __( 'Navigation Label' ) }
 				hideLabelFromVision={ true }
 			/>
@@ -95,9 +123,9 @@ function NavigationMenuItemEdit( {
 							className="wp-block-navigation-menu-item__inline-link-input"
 							onKeyDown={ handleLinkControlOnKeyDown }
 							onKeyPress={ ( event ) => event.stopPropagation() }
-							onClose={ closeLinkControl }
+							onClose={ ( link ) => setAttributes( { link } ) }
 							currentLink={ link }
-							onLinkChange={ ( link ) => setAttributes( { link } ) }
+							onLinkChange={ updateLink }
 							currentSettings={ initialLinkSetting }
 							onSettingsChange={ updateLinkSetting }
 							fetchSearchSuggestions={ fetchSearchSuggestions }
