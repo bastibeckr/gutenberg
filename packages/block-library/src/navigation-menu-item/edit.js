@@ -41,7 +41,7 @@ function NavigationMenuItemEdit( {
 	fetchSearchSuggestions,
 } ) {
 	const { label, link } = attributes;
-	const initialLinkSetting = { 'new-tab': link.newTab };
+	const linkSettings = { 'new-tab': link.newTab };
 	const [ isLinkOpen, setIsLinkOpen ] = useState( false );
 
 	const plainTextRef = useRef( null );
@@ -50,8 +50,8 @@ function NavigationMenuItemEdit( {
 	 * `onKeyDown` LinkControl handler.
 	 * It takes over to stop the event propagation to make the
 	 * navigation bar work, avoiding undesired behaviours.
-	 * For instance, blocks to move between menu items
-	 * when the LinkOver is focused.
+	 * For instance, it blocks to move between menu items
+	 * when the LinkControl is focused.
 	 *
 	 * @param event
 	 */
@@ -123,10 +123,9 @@ function NavigationMenuItemEdit( {
 							className="wp-block-navigation-menu-item__inline-link-input"
 							onKeyDown={ handleLinkControlOnKeyDown }
 							onKeyPress={ ( event ) => event.stopPropagation() }
-							onClose={ ( link ) => setAttributes( { link } ) }
 							currentLink={ link }
 							onLinkChange={ updateLink }
-							currentSettings={ initialLinkSetting }
+							currentSettings={ linkSettings }
 							onSettingsChange={ updateLinkSetting }
 							fetchSearchSuggestions={ fetchSearchSuggestions }
 						/>
