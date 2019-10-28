@@ -125,6 +125,7 @@ function NavigationMenuItemEdit( {
 							onKeyPress={ ( event ) => event.stopPropagation() }
 							currentLink={ link }
 							onLinkChange={ updateLink }
+							onClose={ () => setIsLinkOpen( false ) }
 							currentSettings={ linkSettings }
 							onSettingsChange={ updateLinkSetting }
 							fetchSearchSuggestions={ fetchSearchSuggestions }
