@@ -42,6 +42,19 @@
 - Type: `Function`
 - Required:
 
+Use this callback as an opportunity to know if the link has been changed because of user edition.
+The function callback will get selected item, or Null.
+
+```es6
+<LinkControl
+	onLinkChange={ ( item ) => {
+		item
+			? console.log( `The item selected has the ${ item.id } id` )
+			: console.warn( 'not Item selected' );
+	}
+/> 
+```  
+
 ### onSettingChange
 
 - Type: `Function`
