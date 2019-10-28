@@ -2,7 +2,13 @@
  * External dependencies
  */
 import memoize from 'memize';
-import { kebabCase, camelCase, startCase } from 'lodash';
+import classnames from 'classnames';
+import {
+	camelCase,
+	kebabCase,
+	map,
+	startCase,
+} from 'lodash';
 
 /**
  * WordPress dependencies
@@ -35,17 +41,17 @@ const ColorPanel = ( {
 	<PanelColorSettings
 		title={ title }
 		initialOpen={ false }
-		colorSettings={ colorSettings }
+		colorSettings={ Object.values( colorSettings ) }
 		{ ...colorPanelProps }
 	>
 		{ contrastCheckerProps &&
-			components.map( ( Component, index ) => (
+			map( components, ( ( Component, key ) => (
 				<ContrastChecker
-					key={ Component.displayName }
-					textColor={ colorSettings[ index ].value }
+					key={ key }
+					textColor={ colorSettings[ key ].value }
 					{ ...contrastCheckerProps }
 				/>
-			) ) }
+			) ) ) }
 		{ typeof panelChildren === 'function' ?
 			panelChildren( components ) :
 			panelChildren }
@@ -89,23 +95,34 @@ export default function __experimentalUseColors(
 	const createComponent = useMemo(
 		() =>
 			memoize(
-				( property, color, colorValue, customColor ) => ( { children } ) =>
+				( name, property, className, color, colorValue, customColor ) => ( {
+					children,
+					className: componentClass = '',
+					style: componentStyles = {},
+				} ) =>
 					// Clone children, setting the style property from the color configuration,
 					// if not already set explicitly through props.
 					Children.map( children, ( child ) => {
-						let className = child.props.className;
-						let style = child.props.style;
+						const elementClassName = classnames(
+							componentClass,
+							child.props.className,
+							{
+								[ `has-${ kebabCase( color ) }-${ kebabCase( property ) }` ]: color,
+								[ className || `has-${ kebabCase( name ) }` ]: color || customColor,
+							}
+						);
+						let style = {
+							...componentStyles,
+							...( child.props.style || {} ),
+						};
+
 						if ( color ) {
-							className = `${ child.props.className } has-${ kebabCase(
-								color
-							) }-${ kebabCase( property ) }`;
-							style = { [ property ]: colorValue, ...child.props.style };
+							style = { [ property ]: colorValue, ...style };
 						} else if ( customColor ) {
-							className = `${ child.props.className } has-${ kebabCase( property ) }`;
-							style = { [ property ]: customColor, ...child.props.style };
+							style = { [ property ]: customColor, ...style };
 						}
 						return cloneElement( child, {
-							className,
+							className: elementClassName,
 							style,
 						} );
 					} ),
@@ -135,7 +152,7 @@ export default function __experimentalUseColors(
 	);
 
 	return useMemo( () => {
-		const colorSettings = [];
+		const colorSettings = {};
 
 		const components = colorConfigs.reduce( ( acc, colorConfig ) => {
 			if ( typeof colorConfig === 'string' ) {
@@ -144,7 +161,7 @@ export default function __experimentalUseColors(
 			const {
 				name, // E.g. 'backgroundColor'.
 				property = name, // E.g. 'backgroundColor'.
-
+				className,
 				panelLabel = startCase( name ), // E.g. 'Background Color'.
 				componentName = panelLabel.replace( /\s/g, '' ), // E.g. 'BackgroundColor'.
 
@@ -159,7 +176,9 @@ export default function __experimentalUseColors(
 			// when they are used as props for other components.
 			const _color = colors.find( ( __color ) => __color.slug === color );
 			acc[ componentName ] = createComponent(
+				name,
 				property,
+				className,
 				color,
 				_color && _color.color,
 				attributes[ camelCase( `custom ${ name }` ) ]
@@ -168,21 +187,20 @@ export default function __experimentalUseColors(
 			acc[ componentName ].color = color;
 			acc[ componentName ].setColor = createSetColor( name, colors );
 
-			const newSettingIndex =
-				colorSettings.push( {
-					value: _color ?
-						_color.color :
-						attributes[ camelCase( `custom ${ name }` ) ],
-					onChange: acc[ componentName ].setColor,
-					label: panelLabel,
-					colors,
-				} ) - 1;
+			colorSettings[ componentName ] = {
+				value: _color ?
+					_color.color :
+					attributes[ camelCase( `custom ${ name }` ) ],
+				onChange: acc[ componentName ].setColor,
+				label: panelLabel,
+				colors,
+			};
 			// These settings will be spread over the `colors` in
 			// `colorPanelProps`, so we need to unset the key here,
 			// if not set to an actual value, to avoid overwriting
 			// an actual value in `colorPanelProps`.
 			if ( ! colors ) {
-				delete colorSettings[ newSettingIndex ].colors;
+				delete colorSettings[ componentName ].colors;
 			}
 
 			return acc;
@@ -193,7 +211,7 @@ export default function __experimentalUseColors(
 			colorSettings,
 			colorPanelProps,
 			contrastCheckerProps,
-			components: Object.values( components ),
+			components,
 			panelChildren,
 		};
 		return {
