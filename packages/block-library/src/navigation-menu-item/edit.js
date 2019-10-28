@@ -120,7 +120,8 @@ function NavigationMenuItemEdit( {
 
 	} else {
 		content = <div className="wp-block-navigation-menu-item__container">
-			{ label }
+			{ ( link && link.url ) && <ExternalLink href={ link.url }>{ label }</ExternalLink> }
+			{ ( ! link || ! link.url ) && label }
 		</div>;
 	}
 
