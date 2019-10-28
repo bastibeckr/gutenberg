@@ -17,7 +17,7 @@ import {
 	BlockInspector,
 	WritingFlow,
 	ObserveTyping,
-	LinkControl,
+	__experimentalLinkControl,
 } from '@wordpress/block-editor';
 import {
 	Button,
@@ -131,7 +131,7 @@ function App() {
 								<WritingFlow>
 									<ObserveTyping>
 										{ isVisible &&
-											<LinkControl
+											<__experimentalLinkControl
 												currentLink={ link }
 												currentSettings={ linkSettings }
 												onLinkChange={ ( theLink ) => {
